@@ -1,0 +1,13 @@
+---
+default_destination: roundup
+
+destinations:
+  slurm:
+    env: {}
+    meta: true
+    max_cores: 16
+    max_mem: 128 - 2
+  roundup:
+    meta: slurm
+    native:
+      cluster: roundup

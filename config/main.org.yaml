@@ -1,0 +1,11 @@
+---
+statsd:
+    host: 127.0.0.1
+    port: 8125
+    prefix: jcaas
+
+use_http: false
+
+jcaas:
+    tools: /home/nate/work/jcaas/config/tool_destinations.yaml
+    dests: /home/nate/work/jcaas/config/destination_specifications.org.yaml

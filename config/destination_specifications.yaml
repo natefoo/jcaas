@@ -1,4 +1,6 @@
 ---
+default_destination: sge
+
 destinations:
   condor:
     env: {}
