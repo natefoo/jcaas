@@ -1,6 +1,11 @@
 ---
 default_destination: sge
 
+role_map:
+  gx-admin-force-jobs-to-condor: condor
+  gx-admin-force-jobs-to-drmaa: drmaa
+  gx-admin-force-jobs-to-local: local
+
 destinations:
   condor:
     env: {}

@@ -1,13 +1,27 @@
 ---
 default_destination: roundup
 
+# TODO: implement
+default_cores: 1
+default_memory: 8
+
+# TODO: add some kind of option that indicates that a destination can grow (by a certain number of jobs)
+#
+# Can't really get slots because we don't record slots up front. Should fix this in Galaxy, but for the immediate, we
+# can estimate based on: # jobs queued/running + # jobs "dispatched"
+
 destinations:
   slurm:
     env: {}
     meta: true
     max_cores: 16
     max_mem: 128 - 2
+    params:
+      nativeSpecification: >
+        --cpus-per-task={PARALLELISATION}
+        --mem-per-cpu={MEMORY}
+        {NATIVE_SPEC_EXTRA}
   roundup:
     meta: slurm
-    native:
-      cluster: roundup
+    params:
+      clusters: roundup

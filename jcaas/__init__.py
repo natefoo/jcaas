@@ -47,6 +47,7 @@ DEST_MAP = {
     'slurm': Slurm,
 }
 
+# global to avoid reinstantiating for every job
 JCAAS = None
 
 
@@ -103,6 +104,7 @@ class JCaaS:
             # Higher numbers are lower priority, like `nice`.
             'PRIORITY': tool_spec.get('priority', 128),
             'MEMORY': str(tool_memory) + 'G',
+            'MEMORY_PER_CORE': str(tool_memory) + 'G',
             'PARALLELISATION': "",
             'NATIVE_SPEC_EXTRA': "",
         }
@@ -163,16 +165,6 @@ class JCaaS:
         except KeyError:
             raise Exception("Invalid destination for tool '%s': %s" % (tool_id, requested_destination_name))
         runner_name = destination.name
-        # FIXME: here .eu has a different runner name from dest name, and also allows substrings:
-        #if requested_destination_name == 'sge':
-        #    destination = DEST_DRMAA
-        #    runner_name = 'drmaa'
-        #elif 'condor' in requested_destination_name:
-        #    destination = DEST_CONDOR
-        #    runner_name = 'condor'
-        #else:
-        #    destination = DEST_LOCAL
-        #    runner_name = 'local'
 
         # Only two tools are truly special.
         # TODO: why isn't this in the config?
@@ -193,12 +185,12 @@ class JCaaS:
         tool_spec, destination, runner_name = self.handle_downed_runners(tool_spec, destination, runner_name)
 
         # Send special users to certain destinations temporarily.
-        if 'gx-admin-force-jobs-to-condor' in user_roles:
-            tool_spec = DEST_CONDOR.convert(tool_spec)
-        elif 'gx-admin-force-jobs-to-drmaa' in user_roles:
-            tool_spec = DEST_DRMAA.convert(tool_spec)
-        elif 'gx-admin-force-jobs-to-local' in user_roles:
-            tool_spec = DEST_LOCAL.convert(tool_spec)
+        role_map = SPECIFICATIONS.get('role_map', {})
+        for role, name in role_map.items():
+            if role in user_roles:
+                assert name in self.destinations, "Invalid destination defined for role '%s': %s" % (role, name)
+                destination = self.destinations[name]
+                tool_spec = destination.convert(tool_spec)
 
         # Handle downed runners
 

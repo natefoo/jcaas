@@ -33,13 +33,9 @@ class Condor(Destination):
             params['rank'] = tool_spec['rank']
         return kwargs, raw_allocation_details, params
 
-    @classmethod
-    def is_available(cls):
-        try:
-            os.stat('/usr/local/galaxy/temporarily-disable-condor')
+    def is_available(self):
+        if self.is_disabled():
             return False
-        except OSError:
-            pass
 
         try:
             executors = subprocess.check_output(['condor_status']).decode('utf-8')
@@ -174,8 +170,3 @@ class Condor(Destination):
             'rank': cls.prefer_machines(training_roles),
             'runner': 'condor',
         }
-
-    @classmethod
-    def convert(cls, tool_spec):
-        tool_spec['runner'] = 'condor'
-        return tool_spec

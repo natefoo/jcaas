@@ -33,13 +33,8 @@ class Sge(Destination):
             params['nativeSpecification'] = params['nativeSpecification'].replace('-v _JAVA_OPTIONS', '')
         return kwargs, raw_allocation_details, params
 
-    @classmethod
-    def is_available(cls):
-        try:
-            os.stat('/usr/local/galaxy/temporarily-disable-drmaa')
-            return False
-        except OSError:
-            return True
+    def is_available(self):
+        return not self.is_disabled()
 
     @classmethod
     def reroute_to_dedicated(cls, tool_spec, user_roles):
